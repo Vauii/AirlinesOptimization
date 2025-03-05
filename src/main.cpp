@@ -2,7 +2,7 @@
 #include "parser/DataFrame.hpp"
 
 int main() {
-    DataFrame df;
+    Data::DataFrame df;
     df.read_csv("../data/predicted_pickups.csv");
     
     std::cout << "📊 DataFrame content:\n";
