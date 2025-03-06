@@ -1,24 +1,24 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <string>
 
 
 namespace Data 
 {
-    class DataFrame {
+    class DataFrame 
+    {
         private:
             std::vector<std::vector<std::string>> _data;
-            std::vector<std::string> columns;
+            std::vector<std::string> _columns;
         
         public:
-            void read_csv(const std::string& filename);
+            void ReadCSV(const std::string& filename);
         
             // Вывод всей таблицы
-            void print() const;
+            void Print() const;
             // Получение строки по индексу
-            std::vector<std::string> get_row(size_t index) const;
+            std::vector<std::string> GetRow(size_t index) const;
             // Получение столбца по имени
-            std::vector<std::string> get_column(const std::string& column_name) const;
-        };
+            std::vector<std::string> GetColumn(const std::string& column_name) const;
+    };
 }

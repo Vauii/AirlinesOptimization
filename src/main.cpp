@@ -3,20 +3,27 @@
 
 int main() {
     Data::DataFrame df;
-    df.read_csv("../data/predicted_pickups.csv");
-    
-    std::cout << "📊 DataFrame content:\n";
-    df.print();
+    df.ReadCSV("../data/predicted_pickups.csv");
 
-    std::cout << "\n🔹 Вторая строка: ";
-    for (const auto& cell : df.get_row(1)) {
+    std::cout << "\n🔹 Первая строка: ";
+    for (const auto& cell : df.GetRow(0)) {
         std::cout << cell << " ";
     }
     std::cout << "\n";
 
-    std::cout << "\n🔹 Столбец 'Age': ";
-    for (const auto& val : df.get_column("Age")) {
-        std::cout << val << " ";
+    std::cout << "\n🔹 Вторая строка: ";
+    for (const auto& cell : df.GetRow(1)) {
+        std::cout << cell << " ";
+    }
+    std::cout << "\n";
+
+    std::cout << "\n🔹 Столбец 'price': \n";
+    int i = 0;
+    for (const auto& val : df.GetColumn("price")) {
+        std::cout << val << " \n";
+        i++;
+        if (i > 5)
+            break;
     }
     std::cout << "\n";
 

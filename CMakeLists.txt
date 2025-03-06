@@ -4,4 +4,7 @@ project(Airlines)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(airlines src/main.cpp)
+file(GLOB SRC_FILES "src/*.cpp" "src/**/*.cpp")
+
+add_executable(airlines ${SRC_FILES})
+target_include_directories(airlines PRIVATE src)
