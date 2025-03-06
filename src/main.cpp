@@ -2,30 +2,21 @@
 #include "parser/DataFrame.hpp"
 
 int main() {
-    Data::DataFrame df;
-    df.ReadCSV("../data/predicted_pickups.csv");
+    Data::DataFrame df = Data::DataFrame("../data/predicted_pickups.csv", 300, 14);
+    std::cout << df.data.size() << std::endl;
 
-    std::cout << "\n🔹 Первая строка: ";
-    for (const auto& cell : df.GetRow(0)) {
-        std::cout << cell << " ";
+    for (const auto& flight : df.data) {
+        std::cout << flight.date << " " << flight.origin << " " << flight.destination << " " << flight.Q << std::endl;
     }
-    std::cout << "\n";
 
-    std::cout << "\n🔹 Вторая строка: ";
-    for (const auto& cell : df.GetRow(1)) {
-        std::cout << cell << " ";
+    for (const auto& dayData : df.data[0].q_t_k) {
+        if (dayData.first != 300) {
+            continue;
+        }
+        for (const auto& bookingClassData : dayData.second) {
+            std::cout << dayData.first << " " << bookingClassData.first << " " << bookingClassData.second << std::endl;
+        }
     }
-    std::cout << "\n";
-
-    std::cout << "\n🔹 Столбец 'price': \n";
-    int i = 0;
-    for (const auto& val : df.GetColumn("price")) {
-        std::cout << val << " \n";
-        i++;
-        if (i > 5)
-            break;
-    }
-    std::cout << "\n";
 
     return 0;
 }

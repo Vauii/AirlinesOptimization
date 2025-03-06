@@ -4,60 +4,31 @@
 
 namespace Data 
 {
-    void DataFrame::ReadCSV(const std::string& filename)
+    // T - number of days in the planning horizon
+    // K - number of booking classes
+    DataFrame::DataFrame(const std::string& iFilename, int T, int K)
     {
-        csv::CSVReader reader(filename);
-        bool first_row = true;
+        csv::CSVReader reader(iFilename);
 
-        _columns = reader.get_col_names();
+        int flightDataSize = T * K;
+        int i = 1;
 
-        for (csv::CSVRow& row : reader) {
-            std::vector<std::string> row_data;
-            for (csv::CSVField& field : row) {
-                row_data.push_back(field.get<>());
+        for (csv::CSVRow& row : reader)
+        {   
+
+            if (i == 1) {
+                data.emplace_back(row["FLTDATE"].get<std::string>(), row["ORIG"].get<std::string>(), row["DEST"].get<std::string>(), row["CAP"].get<int>());
+                data.back().c_k.reserve(K);
+                data.back().q_t_k.reserve(K);
             }
-            _data.push_back(row_data);
-        
-        }
-    }
-
-    void DataFrame::Print() const
-    {
-        for (const auto& col : _columns) {
-            std::cout << col << "\t";
-        }
-        std::cout << "\n--------------------------------------\n";
-        
-        for (const auto& row : _data) {
-            for (const auto& cell : row) {
-                std::cout << cell << "\t";
+            data.back().c_k[row["BCL"].get<std::string>()] = row["price"].get<double>();
+            data.back().q_t_k[T - row["DTD"].get<int>()][row["BCL"].get<std::string>()] = row["pickup"].get<int>();
+            if (i == flightDataSize) {
+                i = 1;
             }
-            std::cout << "\n";
+            else {
+                i++;
+            }
         }
     }
-
-    std::vector<std::string> DataFrame::GetRow(size_t index) const
-    {
-        if (index >= _data.size()) {
-            throw std::out_of_range("Row index out of range");
-        }
-        return _data[index];
-    }
-
-    std::vector<std::string> DataFrame::GetColumn(const std::string& column_name) const 
-    {
-        std::vector<std::string> column_data;
-        auto it = std::find(_columns.begin(), _columns.end(), column_name);
-
-        if (it == _columns.end()) {
-            throw std::invalid_argument("Column not found");
-        }
-        
-        size_t col_index = std::distance(_columns.begin(), it);
-        for (const auto& row : _data) {
-            column_data.push_back(row[col_index]);
-        }
-        return column_data;
-    }
-
 }
