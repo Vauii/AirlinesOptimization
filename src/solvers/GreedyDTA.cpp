@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <iomanip>
 #include <fstream>
 
 namespace Alg
@@ -23,19 +24,17 @@ namespace Alg
             }
         }
 
-        std::vector<std::pair<std::string, int>> q_k_sorted(
-            std::make_move_iterator(q_k.begin()),
-            std::make_move_iterator(q_k.end()));
-        std::sort(q_k_sorted.begin(), q_k_sorted.end(), [](const auto& a, const auto& b) {
+        std::vector<std::pair<std::string, double>> c_k_sorted(flight.c_k.begin(),flight.c_k.end());
+        std::sort(c_k_sorted.begin(), c_k_sorted.end(), [](const auto& a, const auto& b) {
             return a.second > b.second;
         });
 
         double revenue = 0.0;
         int ticketsRemaining = flight.Q;
 
-        for (const auto& [k, clientsNum] : q_k_sorted) {
-            int ticketsToSell = std::min(clientsNum, ticketsRemaining);
-            revenue += ticketsToSell * flight.c_k.at(k);
+        for (const auto& [k, c] : c_k_sorted) {
+            int ticketsToSell = std::min(q_k[k], ticketsRemaining);
+            revenue += ticketsToSell * c;
             ticketsRemaining -= ticketsToSell;
             if (ticketsRemaining == 0) {
                 break;
@@ -63,7 +62,7 @@ namespace Alg
 
         outputFile << "FLTDATE,ORIG,DEST,Score\n";
         for (size_t i = 0; i < _results.size(); ++i) {
-            outputFile << _df.flights[i].date << ","
+            outputFile << std::fixed << std::setprecision(0) << _df.flights[i].date << ","
                 << _df.flights[i].origin << ","
                 << _df.flights[i].destination << ","
                 << _results[i] << "\n";

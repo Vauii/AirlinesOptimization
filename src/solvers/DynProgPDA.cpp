@@ -54,8 +54,7 @@ namespace Alg
                 }
                 x -= flight.q_t_k.at(t).at(k);
             }
-            // TODO: return inf
-            return 10000000.0;
+            return 0.0;
         };
 
         std::unordered_map<int, std::unordered_map<int, double>> S_t_q;

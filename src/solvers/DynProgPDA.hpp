@@ -4,7 +4,7 @@
 #include "parser/FlightsDF.hpp"
 
 /*
-    DynProgPDA - Daily Price Assignment
+    DynProgPDA - Daily Price Assignment problem DP solver
 */
 
 namespace Alg
