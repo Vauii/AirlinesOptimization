@@ -72,7 +72,8 @@ namespace Alg
         }
 
         for (int t = 2; t <= flight.q_t_k.size(); ++t) {
-            for (const auto& q : Q_t_ck_sorted_asc.at(t)) {
+            std::cout << "t = " << t << std::endl;
+            for (int q = 0; q <= flight.Q; ++q) {
                 double max = 0;
                 for (const auto& x: Q_t_ck_sorted_asc.at(t)) {
                     if (x > q) {

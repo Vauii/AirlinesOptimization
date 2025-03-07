@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "parser/FlightsDF.hpp"
+#include "../parser/FlightsDF.hpp"
 
 /*
     GreedyDTA - Discriminatory Ticket Allocation problem greedy solver
