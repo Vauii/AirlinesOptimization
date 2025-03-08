@@ -1,21 +1,22 @@
 #pragma once
 
 #include <vector>
-#include "parser/FlightsDF.hpp"
+#include "DataTypes/TypesDefinition.hpp"
+#include "Parser/FlightsDF.hpp"
 
 /*
-    DynProgPDA - Daily Price Assignment problem DP solver
+    GreedyDTA - Discriminatory Ticket Allocation problem greedy solver
 */
 
 namespace Alg
 {
-    class DynProgPDA
+    class GreedyDTA
     {
         public:
-            DynProgPDA(const std::string& iFilename, int T, int K);
+            GreedyDTA(const String& iFilename, int T, int K);
             
             void Solve();
-            void ToCsv(const std::string& iFileName) const;
+            void ToCsv(const String& iFileName) const;
             const std::vector<double>& GetResults() const { return _results; }
 
         private:

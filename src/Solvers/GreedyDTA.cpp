@@ -8,7 +8,7 @@
 
 namespace Alg
 {
-    GreedyDTA::GreedyDTA(const std::string &iFilename, int T, int K)
+    GreedyDTA::GreedyDTA(const String &iFilename, int T, int K)
         : _df(iFilename, T, K)
     {
         N = _df.Size() / (T * K);
@@ -17,14 +17,14 @@ namespace Alg
 
     double GreedyDTA::SolveSingleFlight(const Data::FlightData& flight) const
     {
-        std::unordered_map<std::string, int> q_k; // q_k - sum number of clients for each class
+        HashMap<String, int> q_k; // q_k - sum number of clients for each class
         for (const auto& t : flight.q_t_k) {
             for (const auto& k : t.second) {
                 q_k[k.first] += k.second;
             }
         }
 
-        std::vector<std::pair<std::string, double>> c_k_sorted(flight.c_k.begin(),flight.c_k.end());
+        std::vector<std::pair<String, double>> c_k_sorted(flight.c_k.begin(),flight.c_k.end());
         std::sort(c_k_sorted.begin(), c_k_sorted.end(), [](const auto& a, const auto& b) {
             return a.second > b.second;
         });
@@ -51,7 +51,7 @@ namespace Alg
         }
     }
 
-    void GreedyDTA::ToCsv(const std::string& iFileName) const
+    void GreedyDTA::ToCsv(const String& iFileName) const
     {   
         std::ofstream outputFile(iFileName);
 

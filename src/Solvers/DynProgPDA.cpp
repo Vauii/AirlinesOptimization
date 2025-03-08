@@ -8,7 +8,7 @@
 
 namespace Alg
 {
-    DynProgPDA::DynProgPDA(const std::string &iFilename, int T, int K)
+    DynProgPDA::DynProgPDA(const String &iFilename, int T, int K)
         : _df(iFilename, T, K)
     {
         N = _df.Size() / (T * K);
@@ -27,59 +27,41 @@ namespace Alg
             return potentialClients;
         };   
         
-        std::unordered_map<int, std::unordered_map<std::string, int>> Q_t_ck;
+        HashMap<int, HashMap<String, int>> Q_t_c;
+        HashMap<int, HashMap<int, double>> f_t_x;
+        HashMap<int, std::set<int>> Q_t_c_sets;
         for (const auto& [t, _]: flight.q_t_k) {
+            Q_t_c_sets[t] = std::set<int>();
             for (const auto& [k, c_k] : flight.c_k) {
-                Q_t_ck[t][k] = q_t_c(t, c_k);
+                int potentialClients = q_t_c(t, c_k);
+                Q_t_c[t][k] = potentialClients;
+                Q_t_c_sets[t].insert(potentialClients);
+                f_t_x[t][potentialClients] = c_k;
             }
         }
-        std::unordered_map<int, std::vector<int>> Q_t_ck_sorted_asc;
-        for (const auto& [t, q_t_ck] : Q_t_ck) {
-            Q_t_ck_sorted_asc[t] = std::vector<int>();
-            for (const auto& [k, q_t_k] : q_t_ck) {
-                Q_t_ck_sorted_asc[t].push_back(q_t_k);
-            }
-            std::sort(Q_t_ck_sorted_asc[t].begin(), Q_t_ck_sorted_asc[t].end(), std::less<int>());
-        }
 
-        std::vector<std::pair<std::string, double>> c_k_sorted(flight.c_k.begin(), flight.c_k.end());
-        std::sort(c_k_sorted.begin(), c_k_sorted.end(), [](const auto& a, const auto& b) {
-            return a.second > b.second;
-        });
-
-        auto f_t_x = [&](int t, int x) {
-            for (const auto& [k, c_k] : c_k_sorted) {
-                if (x - flight.q_t_k.at(t).at(k) == 0) {
-                    return flight.c_k.at(k);
-                }
-                x -= flight.q_t_k.at(t).at(k);
+        HashMap<int, HashMap<int, double>> S_t_q;
+        S_t_q.reserve(flight.q_t_k.size());
+        auto calculate_max = [&](const double max, const int t, const int q, const int x) {
+            if (t == 1) {
+                return std::max(max, f_t_x[t][x]*x);
             }
-            return 0.0;
+            return std::max(max, f_t_x[t][x]*x + S_t_q[t-1][q-x]);
         };
 
-        std::unordered_map<int, std::unordered_map<int, double>> S_t_q;
-        S_t_q.reserve(flight.q_t_k.size());
         // TODO: сделать итерацию по t нормально
-        for (const auto& q : Q_t_ck_sorted_asc.at(1)) {
-            double max = 0;
-            for (const auto& x: Q_t_ck_sorted_asc.at(1)) {
-                if (x > q) {
-                    break;
-                }
-                max = std::max(max, f_t_x(1, x)*x);
-            }
-            S_t_q[1][q] = max;
-        }
-
-        for (int t = 2; t <= flight.q_t_k.size(); ++t) {
+        for (int t = 1; t <= flight.q_t_k.size(); ++t) {
             std::cout << "t = " << t << std::endl;
             for (int q = 0; q <= flight.Q; ++q) {
                 double max = 0;
-                for (const auto& x: Q_t_ck_sorted_asc.at(t)) {
+                for (const auto& x: Q_t_c_sets.at(t)) {
                     if (x > q) {
                         break;
                     }
-                    max = std::max(max, f_t_x(t, x)*x + S_t_q[t-1][q-x]);
+                    if (x == 0) {
+                        continue;
+                    }
+                    max = calculate_max(max, t, q, x);
                 }
                 S_t_q[t][q] = max;
             }
@@ -92,6 +74,11 @@ namespace Alg
         return maxRevenue;
     }
 
+    std::vector<String> DynProgPDA::ExtractSolution(const Data::FlightData &flight, HashMap<int, HashMap<int, double>> &S_t_q) const
+    {
+        return std::vector<String>();
+    }
+
     void DynProgPDA::Solve()
     {
         for (const auto& flight : _df.flights) {
@@ -99,7 +86,7 @@ namespace Alg
         }
     }
 
-    void DynProgPDA::ToCsv(const std::string& iFileName) const
+    void DynProgPDA::ToCsv(const String& iFileName) const
     {   
         std::ofstream outputFile(iFileName);
 

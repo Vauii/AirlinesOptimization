@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "DataTypes/TypesDefinition.hpp"
 #include "FlightData.hpp"
 
 namespace Data 
@@ -9,7 +10,7 @@ namespace Data
     {   
         // DataFrame with information about flights
         public:
-            FlightsDF(const std::string& iFilename, int T, int K);
+            FlightsDF(const String& iFilename, int T, int K);
 
             size_t Size() const;
 

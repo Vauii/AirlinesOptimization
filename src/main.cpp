@@ -2,9 +2,9 @@
 #include <iomanip>
 #include <fstream>
 
-#include "parser/FlightsDF.hpp"
-#include "solvers/GreedyDTA.hpp"
-#include "solvers/DynProgPDA.hpp"
+#include "Parser/FlightsDF.hpp"
+#include "Solvers/GreedyDTA.hpp"
+#include "Solvers/DynProgPDA.hpp"
 
 int main() {
     Alg::DynProgPDA solver = Alg::DynProgPDA("../data/predicted_pickups.csv", 300, 14);
