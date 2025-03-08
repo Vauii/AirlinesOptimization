@@ -14,6 +14,6 @@ namespace Data
 
             size_t Size() const;
 
-            std::vector<FlightData> flights;
+            Vector<FlightData> flights;
     };
 }

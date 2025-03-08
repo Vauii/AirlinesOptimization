@@ -24,7 +24,7 @@ namespace Alg
             }
         }
 
-        std::vector<std::pair<String, double>> c_k_sorted(flight.c_k.begin(),flight.c_k.end());
+        Vector<Pair<String, double>> c_k_sorted(flight.c_k.begin(),flight.c_k.end());
         std::sort(c_k_sorted.begin(), c_k_sorted.end(), [](const auto& a, const auto& b) {
             return a.second > b.second;
         });

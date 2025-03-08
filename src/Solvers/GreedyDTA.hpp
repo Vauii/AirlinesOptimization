@@ -17,13 +17,13 @@ namespace Alg
             
             void Solve();
             void ToCsv(const String& iFileName) const;
-            const std::vector<double>& GetResults() const { return _results; }
+            const Vector<double>& GetResults() const { return _results; }
 
         private:
             double SolveSingleFlight(const Data::FlightData& flight) const;
 
             Data::FlightsDF _df;
             int N;
-            std::vector<double> _results;
+            Vector<double> _results;
     };
 }

@@ -17,14 +17,15 @@ namespace Alg
             
             void Solve();
             void ToCsv(const String& iFileName) const;
-            const std::vector<double>& GetResults() const { return _results; }
+            const Vector<Pair<double, Vector<Pair<double, int>>>>& GetResults() const { return _results; }
 
         private:
-            double SolveSingleFlight(const Data::FlightData& flight) const;
-            std::vector<String> ExtractSolution(const Data::FlightData& flight, HashMap<int, HashMap<int, double>>& S_t_q) const;
+            double SolveSingleFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution) const;
+            void ExtractSolution(const Data::FlightData& iFlight, HashMap<int, HashMap<int, double>>& S_t_q, 
+                HashMap<int, HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution) const;
 
             Data::FlightsDF _df;
             int N;
-            std::vector<double> _results;
+            Vector<Pair<double, Vector<Pair<double, int>>>> _results;
     };
 }

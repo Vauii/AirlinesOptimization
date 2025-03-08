@@ -10,7 +10,7 @@ int main() {
     Alg::DynProgPDA solver = Alg::DynProgPDA("../data/predicted_pickups.csv", 300, 14);
     solver.Solve();
     for (const auto& res : solver.GetResults()) {
-        std::cout << std::fixed << std::setprecision(0) <<res << std::endl;
+        std::cout << std::fixed << std::setprecision(0) << res.first << std::endl;
     }
     solver.ToCsv("../results/DynProgPDA.csv");
 

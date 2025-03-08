@@ -1,7 +1,6 @@
 #include "DynProgPDA.hpp"
 
 #include <iostream>
-#include <algorithm>
 #include <iterator>
 #include <iomanip>
 #include <fstream>
@@ -15,7 +14,7 @@ namespace Alg
         _results.reserve(N);
     }
 
-    double DynProgPDA::SolveSingleFlight(const Data::FlightData& flight) const
+    double DynProgPDA::SolveSingleFlight(const Data::FlightData& flight, Vector<Pair<double, int>>& iSolution) const
     {
         auto q_t_c = [&](int t, int c) {
             int potentialClients = 0;
@@ -27,26 +26,25 @@ namespace Alg
             return potentialClients;
         };   
         
-        HashMap<int, HashMap<String, int>> Q_t_c;
-        HashMap<int, HashMap<int, double>> f_t_x;
-        HashMap<int, std::set<int>> Q_t_c_sets;
+        HashMap<int, HashMap<int, Pair<String, double>>> f_t_x;
+        HashMap<int, Set<int>> Q_t_c;
         for (const auto& [t, _]: flight.q_t_k) {
-            Q_t_c_sets[t] = std::set<int>();
+            Q_t_c[t] = Set<int>();
             for (const auto& [k, c_k] : flight.c_k) {
                 int potentialClients = q_t_c(t, c_k);
-                Q_t_c[t][k] = potentialClients;
-                Q_t_c_sets[t].insert(potentialClients);
-                f_t_x[t][potentialClients] = c_k;
+                Q_t_c[t].insert(potentialClients);
+                f_t_x[t][potentialClients].second = c_k;
+                f_t_x[t][potentialClients].first = k;
             }
         }
 
         HashMap<int, HashMap<int, double>> S_t_q;
         S_t_q.reserve(flight.q_t_k.size());
-        auto calculate_max = [&](const double max, const int t, const int q, const int x) {
+        auto CalculateMax = [&](const double max, const int t, const int q, const int x) {
             if (t == 1) {
-                return std::max(max, f_t_x[t][x]*x);
+                return std::max(max, f_t_x[t][x].second*x);
             }
-            return std::max(max, f_t_x[t][x]*x + S_t_q[t-1][q-x]);
+            return std::max(max, f_t_x[t][x].second*x + S_t_q[t-1][q-x]);
         };
 
         // TODO: сделать итерацию по t нормально
@@ -54,14 +52,14 @@ namespace Alg
             std::cout << "t = " << t << std::endl;
             for (int q = 0; q <= flight.Q; ++q) {
                 double max = 0;
-                for (const auto& x: Q_t_c_sets.at(t)) {
+                for (const auto& x: Q_t_c.at(t)) {
                     if (x > q) {
                         break;
                     }
                     if (x == 0) {
                         continue;
                     }
-                    max = calculate_max(max, t, q, x);
+                    max = CalculateMax(max, t, q, x);
                 }
                 S_t_q[t][q] = max;
             }
@@ -71,18 +69,39 @@ namespace Alg
         for (const auto& [q, revenue] : S_t_q.at(flight.q_t_k.size())) {
             maxRevenue = std::max(maxRevenue, revenue);
         }
+        ExtractSolution(flight, S_t_q, f_t_x, iSolution);
         return maxRevenue;
     }
 
-    std::vector<String> DynProgPDA::ExtractSolution(const Data::FlightData &flight, HashMap<int, HashMap<int, double>> &S_t_q) const
+    void DynProgPDA::ExtractSolution(const Data::FlightData &flight, HashMap<int, HashMap<int, double>>& S_t_q, HashMap<int, 
+        HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution) const
     {
-        return std::vector<String>();
+        int t = flight.q_t_k.size();
+        int q = flight.Q;
+        while (t > 0) {
+            if (t == 1) {
+                iSolution.emplace_back(f_t_x[t][q].second, q);
+                q = 0;
+                --t;
+                break;
+            }
+            for (int x = 0; x <= q; ++x) {
+                if (S_t_q[t][q] == S_t_q[t-1][q-x] + f_t_x[t][x].second*x) {
+                    iSolution.emplace_back(f_t_x[t][x].second, x);
+                    q -= x;
+                    --t;
+                    break;
+                }
+            }
+        }
     }
 
     void DynProgPDA::Solve()
     {
         for (const auto& flight : _df.flights) {
-            _results.push_back(SolveSingleFlight(flight));
+            auto solution = Vector<Pair<double, int>>();
+            const auto revenue = SolveSingleFlight(flight, solution);
+            _results.emplace_back(revenue, solution);
         }
     }
 
@@ -95,13 +114,22 @@ namespace Alg
             return;
         }
 
-        outputFile << "FLTDATE,ORIG,DEST,Score\n";
+        outputFile << "FLTDATE,ORIG,DEST,Score";
+        for (size_t t = _df.flights.back().q_t_k.size(); t >= 1; --t) {
+            outputFile << "," << t << "c" << "," << t << "x";
+        }
+        outputFile << "\n";
         for (size_t i = 0; i < _results.size(); ++i) {
             // TODO: fix precision    
             outputFile << std::fixed << std::setprecision(0) << _df.flights[i].date << ","
                 << _df.flights[i].origin << ","
                 << _df.flights[i].destination << ","
-                << _results[i] << "\n";
+                << _results[i].first;
+            for (const auto& [price, clientsCount] : _results[i].second) {
+                outputFile << "," << price << "," << clientsCount;
+            }
+            outputFile << "\n";
+
         }
         outputFile.close();
 
