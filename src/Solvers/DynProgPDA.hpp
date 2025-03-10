@@ -22,7 +22,10 @@ namespace Alg
         private:
             double SolveSingleFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution) const;
             void ExtractSolution(const Data::FlightData& iFlight, HashMap<int, HashMap<int, double>>& S_t_q, 
-                HashMap<int, HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution) const;
+                HashMap<int, HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution,
+                Vector<String>& iSolutionClasses) const;
+            bool CheckSolution(const Data::FlightData& iFlight, const Vector<Pair<double, int>>& iSolution,
+                const Vector<String>& iSolutionClasses) const;
 
             Data::FlightsDF _df;
             int N;
