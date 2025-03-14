@@ -18,7 +18,7 @@ namespace Alg
 
     double DynProgPDA::SolveSingleFlight(const Data::FlightData& flight, Vector<Pair<double, int>>& iSolution) const
     {
-        auto q_t_c = [&](int t, int c) {
+        auto q_t_c = [&](int t, double c) {
             int potentialClients = 0;
             for (const auto& [k, c_k] : flight.c_k) {
                 if (c_k >= c) {
@@ -76,7 +76,7 @@ namespace Alg
         }
         Vector<String> solutionClasses;
         ExtractSolution(flight, S_t_q, f_t_x, iSolution, solutionClasses);
-        assert(CheckSolution(flight, iSolution, solutionClasses));
+        assert(CheckSolution(flight, iSolution, solutionClasses, maxRevenue));
         return maxRevenue;
     }
 
@@ -106,7 +106,8 @@ namespace Alg
         }
     }
 
-    bool Alg::DynProgPDA::CheckSolution(const Data::FlightData &iFlight, const Vector<Pair<double, int>> &iSolution, const Vector<String> &iSolutionClasses) const
+    bool Alg::DynProgPDA::CheckSolution(const Data::FlightData &iFlight, const Vector<Pair<double, int>> &iSolution,
+        const Vector<String> &iSolutionClasses, const double iRevenue) const
     {
         if (iSolution.size() != iFlight.q_t_k.size() || iSolutionClasses.size() != iFlight.q_t_k.size()) {
             return false;
@@ -131,7 +132,7 @@ namespace Alg
             soldTickets += potentialClients;
             revenue += c*potentialClients;
         }
-        return soldTickets == iFlight.Q && revenue == solutionRevenue;
+        return soldTickets == iFlight.Q && revenue == solutionRevenue && solutionRevenue == iRevenue;
     }
 
     void DynProgPDA::Solve()

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include "DataTypes/TypesDefinition.hpp"
 #include "Parser/FlightsDF.hpp"
 
@@ -25,7 +24,7 @@ namespace Alg
                 HashMap<int, HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution,
                 Vector<String>& iSolutionClasses) const;
             bool CheckSolution(const Data::FlightData& iFlight, const Vector<Pair<double, int>>& iSolution,
-                const Vector<String>& iSolutionClasses) const;
+                const Vector<String>& iSolutionClasses, const double iRevenue) const;
 
             Data::FlightsDF _df;
             int N;

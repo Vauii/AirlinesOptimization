@@ -5,9 +5,12 @@
 #include <unordered_map>
 #include <vector>
 #include <algorithm>
+#include "ortools/linear_solver/linear_solver.h"
 
 namespace Alg
 {
+    namespace OR = operations_research;
+    
     using String = std::string;
 
     template <typename Key, typename Value>
