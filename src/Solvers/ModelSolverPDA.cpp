@@ -39,6 +39,12 @@ namespace Alg
             LOG(WARNING) << "Could not create solver " << _solverType;
             return 0.0;
         }
+        if (_solverType == "SCIP") {
+            pSolver->SetSolverSpecificParametersAsString("limits/gap=0.0");
+        }
+        else if (_solverType == "CBC") {
+            pSolver->SetSolverSpecificParametersAsString("ratio=0.0");
+        }
 
         // variables
         HashMap<int, HashMap<String, OR::MPVariable*>> c_t_k;

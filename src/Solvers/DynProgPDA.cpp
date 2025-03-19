@@ -80,8 +80,8 @@ namespace Alg
         return maxRevenue;
     }
 
-    void DynProgPDA::ExtractSolution(const Data::FlightData &flight, HashMap<int, HashMap<int, double>>& S_t_q, HashMap<int, 
-        HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution,
+    void DynProgPDA::ExtractSolution(const Data::FlightData &flight, HashMap<int, HashMap<int, double>>& S_t_q, 
+        HashMap<int, HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution,
         Vector<String>& iSolutionClasses) const
     {
         int t = flight.q_t_k.size();
