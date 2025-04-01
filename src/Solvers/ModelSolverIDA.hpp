@@ -12,9 +12,9 @@
 namespace Alg
 {
     /*
-        PDA - Price Daily Assignment problem linear programming solver
+        IDA - Inventory Daily Assignment problem linear programming solver
     */
-    class ModelSolverPDA
+    class ModelSolverIDA
     {
         public:
             /** @brief Constructor of a ModelSolver. 
@@ -25,19 +25,22 @@ namespace Alg
              *  @param iSolverType - SCIP or CBC. 
              *  @param iUseRelaxation - Relaxe variables if true. 
             */
-            ModelSolverPDA(const String& iFilename, int T, int K, const String& iSolverType = "SCIP", bool iUseRelaxation = false);
+            ModelSolverIDA(const String& iFilename, int T, int K, const String& iSolverType = "SCIP",
+                 bool iUseRelaxation = false, bool iUseDynProgResults = false);
             
             void Solve();
+            static double SolveSingleFlight(const Data::FlightData& iFlight, HashMap<int, HashMap<String,
+                 double>>& iSolution, bool iUseRelaxation, bool iUseDynProgResults, String iSolverType);
             void ToCsv(const String& iFileName) const;
-            const Vector<Pair<double, Vector<Pair<double, int>>>>& GetResults() const { return _results; }
+            const Vector<Pair<double, HashMap<int, HashMap<String, double>>>>& GetResults() const { return _results; }
 
         private:
-            double SolveSingleFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution) const;
-
+            double SolveFlight(const Data::FlightData& iFlight, HashMap<int, HashMap<String, double>>& iSolution) const;
             String _solverType;
             Data::FlightsDF _df;
             int N;
-            bool useRelaxation;
-            Vector<Pair<double, Vector<Pair<double, int>>>> _results;
+            bool _useRelaxation;
+            bool _useDynProgResults;
+            Vector<Pair<double, HashMap<int, HashMap<String, double>>>> _results;
     };
 }

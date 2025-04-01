@@ -4,7 +4,7 @@
 #include "Parser/FlightsDF.hpp"
 
 /*
-    DynProgPDA - Daily Price Assignment problem DP solver
+    DynProgPDA - Price Daily Assignment problem DP solver
 */
 
 namespace Alg
@@ -18,13 +18,15 @@ namespace Alg
             void ToCsv(const String& iFileName) const;
             const Vector<Pair<double, Vector<Pair<double, int>>>>& GetResults() const { return _results; }
 
+            static HashMap<int, String> SolveSingleFlight(const Data::FlightData& iFlight, const double iPriceEpsilon = 1e-6);
+
         private:
-            double SolveSingleFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution) const;
-            void ExtractSolution(const Data::FlightData& iFlight, HashMap<int, HashMap<int, double>>& S_t_q, 
+            static double SolveSingleFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution);
+            static void ExtractSolution(const Data::FlightData& iFlight, HashMap<int, HashMap<int, double>>& S_t_q, 
                 HashMap<int, HashMap<int, Pair<String, double>>>& f_t_x, Vector<Pair<double, int>>& iSolution,
-                Vector<String>& iSolutionClasses) const;
-            bool CheckSolution(const Data::FlightData& iFlight, const Vector<Pair<double, int>>& iSolution,
-                const Vector<String>& iSolutionClasses, const double iRevenue) const;
+                Vector<String>& iSolutionClasses);
+            static bool CheckSolution(const Data::FlightData& iFlight, const Vector<Pair<double, int>>& iSolution,
+                const Vector<String>& iSolutionClasses, const double iRevenue);
 
             Data::FlightsDF _df;
             int N;

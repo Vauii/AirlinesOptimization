@@ -7,9 +7,10 @@
 
 namespace Alg
 {
-    ModelSolverPDA::ModelSolverPDA(const String& iFilename, int T, int K, const String& iSolverType)
+    ModelSolverPDA::ModelSolverPDA(const String& iFilename, int T, int K, const String& iSolverType, bool iUseRelaxation)
         : _df(iFilename, T, K)
     {
+        useRelaxation = iUseRelaxation;
         N = _df.Size() / (T * K);
         _results.reserve(N);
         _solverType = iSolverType;
@@ -50,7 +51,11 @@ namespace Alg
         HashMap<int, HashMap<String, OR::MPVariable*>> c_t_k;
         for (const auto& [t, _]: flight.q_t_k) {
             for (const auto& [k, _] : flight.c_k) {
-                c_t_k[t][k] = pSolver->MakeBoolVar("c_" + std::to_string(t) + "_" + k);
+                if (useRelaxation) {
+                    c_t_k[t][k] = pSolver->MakeNumVar(0.0, 1.0, "c_" + std::to_string(t) + "_" + k);
+                }
+                else
+                    c_t_k[t][k] = pSolver->MakeBoolVar("c_" + std::to_string(t) + "_" + k);
             }
         }
 
@@ -87,13 +92,17 @@ namespace Alg
         }
         LOG(INFO) << "Optimal objective value = " << pObjective->Value();
 
+        int ticketsRemaining = flight.Q;
         for (size_t t = _df.flights.back().q_t_k.size(); t >= 1; --t) {
-            for (const auto& [k, _] : flight.c_k) {
-                if (c_t_k[t][k]->solution_value() > 0.5) {
-                    iSolution.emplace_back(flight.c_k.at(k), q_t_c(t, flight.c_k.at(k)));
-                    break;
+            auto it = std::max_element(
+                c_t_k[t].begin(),
+                c_t_k[t].end(),
+                [](const auto& a, const auto& b) {
+                    return a.second->solution_value() < b.second->solution_value();
                 }
-            }
+            );
+            const auto potentialClients = q_t_c(t, flight.c_k.at(it->first));
+            iSolution.emplace_back(flight.c_k.at(it->first), potentialClients);
         }
         
         return pObjective->Value();
@@ -123,7 +132,6 @@ namespace Alg
         }
         outputFile << "\n";
         for (size_t i = 0; i < _results.size(); ++i) {
-            // TODO: fix precision    
             outputFile << std::fixed << std::setprecision(0) << _df.flights[i].date << ","
                 << _df.flights[i].origin << ","
                 << _df.flights[i].destination << ","
