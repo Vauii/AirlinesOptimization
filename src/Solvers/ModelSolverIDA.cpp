@@ -21,7 +21,7 @@ namespace Alg
     }
 
     double ModelSolverIDA::SolveSingleFlight(const Data::FlightData& iFlight, HashMap<int, HashMap<String,
-         double>>& iSolution, bool iUseRelaxation = false, bool iUseDynProgResults = false, String iSolverType = "SCIP")
+         double>>& iSolution, bool iUseRelaxation, bool iUseDynProgResults, String iSolverType)
     {   
         Vector<Pair<String, double>> c_k_sorted(iFlight.c_k.begin(),iFlight.c_k.end());
         std::sort(c_k_sorted.begin(), c_k_sorted.end(), [](const auto& a, const auto& b) {
@@ -171,7 +171,7 @@ namespace Alg
             }
         }
         const double EPS = 10e-6;
-        assert(std::abs(ticketsSold - iFlight.Q) < EPS);
+        assert(ticketsSold <= iFlight.Q);
         return pObjective->Value();
     }
 

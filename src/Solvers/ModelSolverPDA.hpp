@@ -27,17 +27,20 @@ namespace Alg
             */
             ModelSolverPDA(const String& iFilename, int T, int K, const String& iSolverType = "SCIP", bool iUseRelaxation = false);
             
+            static double SolveSingleFlight(const Data::FlightData& iFlight,
+                Vector<Pair<double, int>>& iSolution, bool iUseRelaxation = false, String iSolverType = "SCIP");
+            
             void Solve();
             void ToCsv(const String& iFileName) const;
             const Vector<Pair<double, Vector<Pair<double, int>>>>& GetResults() const { return _results; }
 
         private:
-            double SolveSingleFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution) const;
+            double SolveFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution) const;
 
             String _solverType;
             Data::FlightsDF _df;
             int N;
-            bool useRelaxation;
+            bool _useRelaxation;
             Vector<Pair<double, Vector<Pair<double, int>>>> _results;
     };
 }

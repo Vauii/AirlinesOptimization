@@ -25,12 +25,14 @@ namespace Alg
              *  @param iSolverType - SCIP or CBC. 
              *  @param iUseRelaxation - Relaxe variables if true. 
             */
-            ModelSolverIDA(const String& iFilename, int T, int K, const String& iSolverType = "SCIP",
-                 bool iUseRelaxation = false, bool iUseDynProgResults = false);
+            ModelSolverIDA(const String& iFilename, int T, int K, const String& iSolverType = "SCIP", bool iUseRelaxation = false, bool iUseDynProgResults = false);
+            
+
+            
+            static void ToCsv(const String& iFileName, double iTargetValue, HashMap<int, HashMap<String, double>>& iSolution);
+            static double SolveSingleFlight(const Data::FlightData& iFlight, HashMap<int, HashMap<String, double>>& iSolution, bool iUseRelaxation = false, bool iUseDynProgResults = false, String iSolverType = "SCIP");
             
             void Solve();
-            static double SolveSingleFlight(const Data::FlightData& iFlight, HashMap<int, HashMap<String,
-                 double>>& iSolution, bool iUseRelaxation, bool iUseDynProgResults, String iSolverType);
             void ToCsv(const String& iFileName) const;
             const Vector<Pair<double, HashMap<int, HashMap<String, double>>>>& GetResults() const { return _results; }
 

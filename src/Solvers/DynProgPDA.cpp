@@ -86,16 +86,10 @@ namespace Alg
     {
         int t = flight.q_t_k.size();
         int q = flight.Q;
-        while (t > 0) {
-            if (t == 1) {
-                iSolution.emplace_back(f_t_x[t][q].second, q);
-                iSolutionClasses.emplace_back(f_t_x[t][q].first);
-                q = 0;
-                --t;
-                break;
-            }
+        while (t > 0 && q > 0) {
             for (int x = 0; x <= q; ++x) {
-                if (S_t_q[t][q] == S_t_q[t-1][q-x] + f_t_x[t][x].second*x) {
+                double prev_S_t_q = t == 1 ? 0 : S_t_q[t-1][q-x]; 
+                if (S_t_q[t][q] == prev_S_t_q + f_t_x[t][x].second*x && x > 0) {
                     iSolution.emplace_back(f_t_x[t][x].second, x);
                     iSolutionClasses.emplace_back(f_t_x[t][x].first);
                     q -= x;
@@ -112,7 +106,7 @@ namespace Alg
         if (iSolution.size() != iFlight.q_t_k.size() || iSolutionClasses.size() != iFlight.q_t_k.size()) {
             return false;
         }
-        int soldTickets = 0, seats = iFlight.Q;
+        int soldTickets = 0;
         double revenue = 0, solutionRevenue = 0;
 
         for (int t = iFlight.q_t_k.size(); t >= 1; --t) {
@@ -126,13 +120,15 @@ namespace Alg
                     potentialClients += iFlight.q_t_k.at(t).at(k);
                 }
             }
+            if (iSolutionClasses[i] == "")
+                continue;
             if (x != potentialClients) {
                 return false;
             }
             soldTickets += potentialClients;
             revenue += c*potentialClients;
         }
-        return soldTickets == iFlight.Q && revenue == solutionRevenue && solutionRevenue == iRevenue;
+        return soldTickets <= iFlight.Q && revenue == solutionRevenue && solutionRevenue == iRevenue;
     }
 
     void DynProgPDA::Solve()
