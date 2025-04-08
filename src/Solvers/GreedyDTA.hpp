@@ -13,7 +13,7 @@ namespace Alg
     class GreedyDTA
     {
         public:
-            GreedyDTA(const String& iFilename, int T, int K);
+            GreedyDTA(const String& iFilename);
             
             void Solve();
             void ToCsv(const String& iFileName) const;
@@ -23,7 +23,6 @@ namespace Alg
             double SolveSingleFlight(const Data::FlightData& flight) const;
 
             Data::FlightsDF _df;
-            int N;
             Vector<double> _results;
     };
 }

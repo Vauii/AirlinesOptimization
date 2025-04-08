@@ -7,13 +7,10 @@
 
 namespace Alg
 {
-    ModelSolverPDA::ModelSolverPDA(const String& iFilename, int T, int K, const String& iSolverType, bool iUseRelaxation)
-        : _df(iFilename, T, K)
+    ModelSolverPDA::ModelSolverPDA(const String& iFilename, const String& iSolverType, bool iUseRelaxation)
+        : _df(iFilename), _useRelaxation(iUseRelaxation), _solverType(iSolverType)
     {
-        _useRelaxation = iUseRelaxation;
-        N = _df.Size() / (T * K);
-        _results.reserve(N);
-        _solverType = iSolverType;
+        _results.reserve(_df.Size());
     }
 
     double ModelSolverPDA::SolveSingleFlight(const Data::FlightData& iFlight,
@@ -94,7 +91,7 @@ namespace Alg
         LOG(INFO) << "Optimal objective value = " << pObjective->Value();
 
         int ticketsRemaining = iFlight.Q;
-        for (size_t t = iFlight.q_t_k.size(); t >= 1; --t) {
+        for (int t = iFlight.q_t_k.size(); t >= 1; --t) {
             auto it = std::max_element(
                 c_t_k[t].begin(),
                 c_t_k[t].end(),
@@ -133,17 +130,26 @@ namespace Alg
         }
 
         outputFile << "FLTDATE,ORIG,DEST,Score";
-        for (size_t t = _df.flights.back().q_t_k.size(); t >= 1; --t) {
-            outputFile << "," << t << "c" << "," << t << "x";
+        int maxT = 0;
+        for (const auto& flight : _df.flights) {
+            if (flight.q_t_k.size() > maxT) {
+                maxT = flight.q_t_k.size();
+            }
+        }
+        for (int t = 1; t <= maxT; ++t) {
+            outputFile << "," << t;
         }
         outputFile << "\n";
-        for (size_t i = 0; i < _results.size(); ++i) {
+        for (int i = 0; i < _results.size(); ++i) {
             outputFile << std::fixed << std::setprecision(0) << _df.flights[i].date << ","
                 << _df.flights[i].origin << ","
                 << _df.flights[i].destination << ","
                 << _results[i].first;
-            for (const auto& [price, clientsCount] : _results[i].second) {
-                outputFile << "," << price << "," << clientsCount;
+            int T = _results[i].second.size();
+            for (int t = 1; t <= T; ++t) {
+                const double price = _results[i].second[T - t].first;
+                const int count = _results[i].second[T - t].second;
+                outputFile << ",(" << std::setprecision(2) << price << " " << count << ")";
             }
             outputFile << "\n";
 

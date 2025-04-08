@@ -19,13 +19,11 @@ namespace Alg
         public:
             /** @brief Constructor of a ModelSolver. 
              *  @details Linear programming solver including MIP. 
-             *  @param iFilename - Path to dataset. 
-             *  @param T - Time moments count in each sample. 
-             *  @param K - Ticket pricing classes count. 
+             *  @param iFilename - Path to dataset.
              *  @param iSolverType - SCIP or CBC. 
              *  @param iUseRelaxation - Relaxe variables if true. 
             */
-            ModelSolverIDA(const String& iFilename, int T, int K, const String& iSolverType = "SCIP", bool iUseRelaxation = false, bool iUseDynProgResults = false);
+            ModelSolverIDA(const String& iFilename, const String& iSolverType = "SCIP", bool iUseRelaxation = false, bool iUseDynProgResults = false);
             
 
             
@@ -40,7 +38,6 @@ namespace Alg
             double SolveFlight(const Data::FlightData& iFlight, HashMap<int, HashMap<String, double>>& iSolution) const;
             String _solverType;
             Data::FlightsDF _df;
-            int N;
             bool _useRelaxation;
             bool _useDynProgResults;
             Vector<Pair<double, HashMap<int, HashMap<String, double>>>> _results;

@@ -9,11 +9,10 @@
 
 namespace Alg
 {
-    DynProgPDA::DynProgPDA(const String &iFilename, int T, int K)
-        : _df(iFilename, T, K)
+    DynProgPDA::DynProgPDA(const String &iFilename)
+        : _df(iFilename)
     {
-        N = _df.Size() / (T * K);
-        _results.reserve(N);
+        _results.reserve(_df.Size());
     }
 
     double DynProgPDA::SolveSingleFlight(const Data::FlightData& iFlight, Vector<Pair<double, int>>& iSolution)

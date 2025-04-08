@@ -5,31 +5,55 @@
 
 namespace Data 
 {
-    // T - number of days in the planning horizon
-    // K - number of booking classes
-    FlightsDF::FlightsDF(const String& iFilename, int T, int K)
+    FlightsDF::FlightsDF(const String& iFilename)
     {
         csv::CSVReader reader(iFilename);
-
-        int flightDataSize = T * K;
-        int i = 1;
+        bool IsFirstRow = true;
+        String prevDate;
+        String prevOrigin;
+        String prevDestination;
+        HashMap<int, HashMap<String, int>> q_DTD_k; // q^DTD_k - the number of passengers on DTD in booking class k, where DTD stands for days till department
+        int T = 0;
 
         for (csv::CSVRow& row : reader)
         {   
-
-            if (i == 1) {
-                flights.emplace_back(row["FLTDATE"].get<String>(), row["ORIG"].get<String>(), row["DEST"].get<String>(), row["CAP"].get<int>());
-                flights.back().c_k.reserve(K);
-                flights.back().q_t_k.reserve(K);
+            if (IsFirstRow)
+            {
+                prevDate = row["FLTDATE"].get<String>();
+                prevOrigin = row["ORIG"].get<String>();
+                prevDestination = row["DEST"].get<String>();
+                flights.emplace_back(prevDate, prevOrigin, prevDestination, row["CAP"].get<int>());
+                IsFirstRow = false;
             }
-            flights.back().c_k[row["BCL"].get<String>()] = row["price"].get<double>();
-            flights.back().q_t_k[T - row["DTD"].get<int>()][row["BCL"].get<String>()] = row["pickup"].get<int>();
-            if (i == flightDataSize) {
-                i = 1;
+            const auto currDate = row["FLTDATE"].get<String>();
+            const auto currOrigin = row["ORIG"].get<String>();
+            const auto currDestination = row["DEST"].get<String>();
+            if (prevDate != currDate || prevOrigin != currOrigin || prevDestination != currDestination){
+                T += 1;
+                for (const auto& [dtd, q_k] : q_DTD_k)
+                {
+                    flights.back().q_t_k[T - dtd] = q_k;
+                }
+                q_DTD_k.clear();
+                T = 0;
+                prevDate = currDate;
+                prevOrigin = currOrigin;
+                prevDestination = currDestination;
+                flights.emplace_back(prevDate, prevOrigin, prevDestination, row["CAP"].get<int>());
             }
-            else {
-                i++;
-            }
+            const auto ticketClass = row["BCL"].get<String>();
+            const auto price = row["price"].get<double>();
+            const auto pickup = row["pickup"].get<int>();
+            flights.back().c_k[ticketClass] = price;
+            int dtd = row["DTD"].get<int>();
+            if (dtd > T) 
+                T = dtd;
+            q_DTD_k[dtd][ticketClass] = pickup;
+        }
+        T += 1;
+        for (const auto& [dtd, q_k] : q_DTD_k)
+        {
+            flights.back().q_t_k[T - dtd] = q_k;
         }
     }
 

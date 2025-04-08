@@ -12,7 +12,7 @@ namespace Alg
     class DynProgPDA
     {
         public:
-            DynProgPDA(const String& iFilename, int T, int K);
+            DynProgPDA(const String& iFilename);
             
             void Solve();
             void ToCsv(const String& iFileName) const;
@@ -29,7 +29,6 @@ namespace Alg
                 const Vector<String>& iSolutionClasses, const double iRevenue);
 
             Data::FlightsDF _df;
-            int N;
             Vector<Pair<double, Vector<Pair<double, int>>>> _results;
     };
 }

@@ -10,7 +10,7 @@ namespace Data
     {   
         // DataFrame with information about flights
         public:
-            FlightsDF(const String& iFilename, int T, int K);
+            FlightsDF(const String& iFilename);
 
             size_t Size() const;
 

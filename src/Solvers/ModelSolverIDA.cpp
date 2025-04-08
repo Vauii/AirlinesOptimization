@@ -9,15 +9,14 @@
 
 namespace Alg
 {
-    ModelSolverIDA::ModelSolverIDA(const String& iFilename, int T, int K, const String& iSolverType,
+    ModelSolverIDA::ModelSolverIDA(const String& iFilename, const String& iSolverType,
          bool iUseRelaxation, bool iUseDynProgResults)
-        : _df(iFilename, T, K),
+        : _df(iFilename),
           _solverType(iSolverType),
           _useRelaxation(iUseRelaxation), 
           _useDynProgResults(iUseDynProgResults)
     {
-        N = _df.Size() / (T * K);
-        _results.reserve(N);
+        _results.reserve(_df.Size());
     }
 
     double ModelSolverIDA::SolveSingleFlight(const Data::FlightData& iFlight, HashMap<int, HashMap<String,
